@@ -1,38 +1,61 @@
 import curses
 import subprocess
-import time
 import argparse
 
 
-def main(stdscr):
-    parser = argparse.ArgumentParser(description='An easy to use tool to assist in doing technical presentations. ')
-    parser.add_argument('inputfile', type=open, help='The input file containing the commands to be ran.')
-    
-    args = parser.parse_args()
-    commands = args.inputfile.read().split('\n')
-    stdscr.clear()
 
+parser = argparse.ArgumentParser(description='An easy to use tool to assist in doing technical presentations. ')
+parser.add_argument('inputfile', type=open, help='The input file containing the commands to be ran.')
+
+args = parser.parse_args()
+
+
+# This function allows the user to modify a command on the fly before it is finished
+def modify_command(stdscr, command):
+    while True:
+        key = stdscr.getch()
+        if key == 10:
+            break
+        elif key == 127 or key == curses.KEY_BACKSPACE:
+            command = command[:-1]
+            y, x = stdscr.getyx()
+            stdscr.move(y, x-1)
+            stdscr.delch()
+            stdscr.refresh()
+        else:
+            command += chr(key)
+            stdscr.addch(key)
+            stdscr.refresh()
+
+    return command
+
+
+
+def main(stdscr):
+    # Read the commands from the input but the last line
+    commands = args.inputfile.read().split('\n')[:-1]
+    stdscr.clear()
     for command in commands:
-        # Clear screen
-        # The command to be typed out
         command_index = 0
         # Display a simple prompt
         stdscr.addstr("$ ")
-        # Infinite loop to emulate the terminal
+
+
         while command_index < len(command):
             # Get user input (wait for key press)
             key = stdscr.getch()
+            
+            # Enter edit command mode by pressing backspace
+            if key == 127 or key == curses.KEY_BACKSPACE:
+                command = modify_command(stdscr, command[0:command_index])
+                break
             # Get the current character from the command to type
             char_to_type = command[command_index]
-            # Add the character to the screen
             stdscr.addch(char_to_type)
-            # Update the index
             command_index += 1
-            # Refresh the screen
             stdscr.refresh()
-            # Small delay for more realistic typing effect
-            #time.sleep(0.1)
-        # After typing is done, move to the next line
+        while stdscr.getch() != 10:
+            pass
         stdscr.addstr("\n")
         # Execute the command and capture the output
         try:
@@ -45,12 +68,12 @@ def main(stdscr):
             stdscr.addstr(f"Error: {e}")
         # Refresh the screen to show output
         stdscr.refresh()
+    stdscr.addstr("$ ")
+
     # Wait for escape key press
     while stdscr.getch() != 27:
         pass
 
-
-    # Clear screen
     stdscr.clear()
 # Initialize curses
 curses.wrapper(main)
