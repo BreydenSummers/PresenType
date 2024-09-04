@@ -12,6 +12,12 @@ positional arguments:
 options:
   -h, --help  show this help message and exit
 ```
+##### $\color{wheat}{\text{Example input file:}}$
+
+```
+ls
+echo hello world!
+```
 ## $\color{wheat}{\textbf{Dependencies}}$
 ```bash
 pip install curses
