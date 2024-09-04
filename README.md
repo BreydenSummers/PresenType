@@ -19,6 +19,11 @@ ls
 echo hello world!
 ```
 ## $\color{wheat}{\textbf{Dependencies}}$
+##### $\color{wheat}{\text{Windows:}}$
 ```bash
-pip install curses
+pip install windows-curses
+```
+##### $\color{wheat}{\text{MAC/Linux:}}$
+```bash
+echo "curses comes in the python standard library on mac and linux!"
 ```
